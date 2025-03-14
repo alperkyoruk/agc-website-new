@@ -12,9 +12,11 @@
   "dependencies": {
     "@tailwindcss/vite": "^4.0.13",
     "crypto-browserify": "^3.12.1",
+    "lucide-react": "^0.479.0",
     "n": "^10.1.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-grid-gallery": "^1.0.1",
     "stable": "^0.1.8",
     "tailwindcss": "^4.0.13"
   },
