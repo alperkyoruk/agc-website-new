@@ -16,7 +16,7 @@ function Hero() {
     const fetchEventsAndSetCountdown = async () => {
       try {
         const response = await fetch(
-          "http://api.yildizskylab.com/api/events/getAllByTenant?tenant=AGC"
+          "https://api.yildizskylab.com/api/events/getAllByTenant?tenant=AGC" // Changed to https
         );
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
