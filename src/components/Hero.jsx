@@ -7,82 +7,53 @@ const initialCountdownItems = [
   { label: "Seconds", value: "00" },
 ];
 
-function Hero() {
+function Hero({ nextEventNameProp, targetDateProp, loadingCountdownProp }) {
   const [countdownItems, setCountdownItems] = useState(initialCountdownItems);
   const [nextEventName, setNextEventName] = useState("");
-  const [loadingCountdown, setLoadingCountdown] = useState(true);
+  // Use the loading prop from App.jsx for initial state
+  const [loadingCountdown, setLoadingCountdown] = useState(loadingCountdownProp);
 
   useEffect(() => {
-    const fetchEventsAndSetCountdown = async () => {
-      try {
-        const response = await fetch(
-          "https://api.yildizskylab.com/api/events/getAllByTenant?tenant=AGC" // Changed to https
-        );
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const result = await response.json();
-        if (result.success && result.data && result.data.length > 0) {
-          const now = new Date();
-          const upcomingActiveEvents = result.data
-            .filter(event => {
-              const eventDate = new Date(event.date.split(' ')[0].split('-').reverse().join('-') + 'T' + event.date.split(' ')[1]);
-              return event.isActive && eventDate > now;
-            })
-            .sort((a, b) => {
-              const dateA = new Date(a.date.split(' ')[0].split('-').reverse().join('-') + 'T' + a.date.split(' ')[1]);
-              const dateB = new Date(b.date.split(' ')[0].split('-').reverse().join('-') + 'T' + b.date.split(' ')[1]);
-              return dateA - dateB; // Sort ascending (soonest first)
-            });
+    // Update local state when props change
+    setNextEventName(nextEventNameProp || "");
+    setLoadingCountdown(loadingCountdownProp);
 
-          if (upcomingActiveEvents.length > 0) {
-            const nextEvent = upcomingActiveEvents[0];
-            setNextEventName(nextEvent.title);
-            const targetDate = new Date(nextEvent.date.split(' ')[0].split('-').reverse().join('-') + 'T' + nextEvent.date.split(' ')[1]).getTime();
+    if (targetDateProp && !loadingCountdownProp) {
+      const interval = setInterval(() => {
+        const nowMillis = new Date().getTime();
+        const distance = targetDateProp - nowMillis;
 
-            const interval = setInterval(() => {
-              const nowMillis = new Date().getTime();
-              const distance = targetDate - nowMillis;
-
-              if (distance < 0) {
-                clearInterval(interval);
-                setCountdownItems(initialCountdownItems); // Reset or show "Event Started"
-                setNextEventName("The event has started!");
-                return;
-              }
-
-              const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-              const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-              const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-              const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-              setCountdownItems([
-                { label: "Days", value: String(days).padStart(2, '0') },
-                { label: "Hours", value: String(hours).padStart(2, '0') },
-                { label: "Minutes", value: String(minutes).padStart(2, '0') },
-                { label: "Seconds", value: String(seconds).padStart(2, '0') },
-              ]);
-            }, 1000);
-            setLoadingCountdown(false);
-            return () => clearInterval(interval);
-          } else {
-            setNextEventName("No upcoming events scheduled.");
-            setLoadingCountdown(false);
+        if (distance < 0) {
+          clearInterval(interval);
+          setCountdownItems(initialCountdownItems);
+          // Update event name if it was counting down and now finished
+          if (nextEventNameProp && !nextEventNameProp.includes("No upcoming") && !nextEventNameProp.includes("Error")) {
+            setNextEventName("The event has started!");
           }
-        } else {
-          setNextEventName("Could not load event data.");
-          setLoadingCountdown(false);
+          return;
         }
-      } catch (e) {
-        console.error("Error fetching events for countdown:", e);
-        setNextEventName("Error loading events.");
-        setCountdownItems(initialCountdownItems);
-        setLoadingCountdown(false);
-      }
-    };
 
-    fetchEventsAndSetCountdown();
-  }, []);
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        setCountdownItems([
+          { label: "Days", value: String(days).padStart(2, '0') },
+          { label: "Hours", value: String(hours).padStart(2, '0') },
+          { label: "Minutes", value: String(minutes).padStart(2, '0') },
+          { label: "Seconds", value: String(seconds).padStart(2, '0') },
+        ]);
+      }, 1000);
+      return () => clearInterval(interval);
+    } else if (!loadingCountdownProp) {
+      // If no targetDateProp or still loading, set default or error message
+      setCountdownItems(initialCountdownItems);
+      if (!nextEventNameProp) { // If prop is empty and not loading, means error or no data
+          setNextEventName("Countdown not available.");
+      }
+    }
+  }, [nextEventNameProp, targetDateProp, loadingCountdownProp]);
 
   return (
     <div

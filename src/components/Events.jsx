@@ -1,44 +1,36 @@
 import React, { useState, useEffect } from "react";
-import { ChevronLeftIcon, ChevronRightIcon, CalendarDaysIcon, InformationCircleIcon } from '@heroicons/react/24/outline'; // Using outline icons
+import { ChevronLeftIcon, ChevronRightIcon, CalendarDaysIcon } from '@heroicons/react/24/outline'; // Removed InformationCircleIcon as it's not used
 
-function Events() {
+function Events({ allEventsData, loading: propLoading, error: propError }) {
   const [events, setEvents] = useState([]);
   const [activeEventIndex, setActiveEventIndex] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  // Use props for loading and error states
+  const [loading, setLoading] = useState(propLoading);
+  const [error, setError] = useState(propError);
 
   useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        const response = await fetch(
-          "https://api.yildizskylab.com/api/events/getAllByTenant?tenant=AGC" // Changed to https
-        );
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const result = await response.json();
-        if (result.success && result.data) {
-          const sortedEvents = result.data.sort((a, b) => {
-            const dateA = new Date(a.date.split(' ')[0].split('-').reverse().join('-') + 'T' + a.date.split(' ')[1]);
-            const dateB = new Date(b.date.split(' ')[0].split('-').reverse().join('-') + 'T' + b.date.split(' ')[1]);
-            return dateB - dateA; // Sort descending (newest first)
-          });
-          setEvents(sortedEvents);
-          const firstActiveIndex = sortedEvents.findIndex(event => event.isActive);
-          setActiveEventIndex(firstActiveIndex !== -1 ? firstActiveIndex : 0);
-        } else {
-          setError(result.message || "Failed to fetch events");
-        }
-      } catch (e) {
-        setError(e.message);
-        console.error("Error fetching events:", e);
-      } finally {
-        setLoading(false);
-      }
-    };
+    // Update local state when props change
+    setLoading(propLoading);
+    setError(propError);
 
-    fetchEvents();
-  }, []);
+    if (!propLoading && !propError && allEventsData) {
+      const sortedEvents = [...allEventsData].sort((a, b) => { // Create a copy before sorting
+        const dateA = new Date(a.date.split(' ')[0].split('-').reverse().join('-') + 'T' + a.date.split(' ')[1]);
+        const dateB = new Date(b.date.split(' ')[0].split('-').reverse().join('-') + 'T' + b.date.split(' ')[1]);
+        return dateB - dateA; // Sort descending (newest first)
+      });
+      setEvents(sortedEvents);
+      if (sortedEvents.length > 0) {
+        const firstActiveIndex = sortedEvents.findIndex(event => event.isActive);
+        setActiveEventIndex(firstActiveIndex !== -1 ? firstActiveIndex : 0);
+      } else {
+        setActiveEventIndex(0);
+      }
+    } else if (!propLoading && !propError && !allEventsData) {
+        // Handle case where data might be null/undefined but not an error explicitly
+        setEvents([]);
+    }
+  }, [allEventsData, propLoading, propError]);
 
   const handlePrev = () => {
     setActiveEventIndex((prevIndex) =>
