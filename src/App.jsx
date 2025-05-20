@@ -7,6 +7,8 @@ import SSS from "./components/SSS";
 import Team from "./components/Team";
 import GallerySection from "./components/GallerySection";
 import Footer from "./components/Footer";
+import Divider from "./components/Divider"; // Import Divider
+import Events from "./components/Events"; // Import Events
 
 function App() {
   return (
@@ -15,33 +17,22 @@ function App() {
       <Hero />
       <About />
 
-      <div className="w-full">
-        <img
-          src="/assets/section_divider.png"
-          alt="Section Divider"
-          className="relative bottom-4 lg:bottom-15 w-full h-auto object-contain"
-        />
-      </div>
+      {/* Replaced with Divider component, passing original classes */}
+      <Divider className="relative bottom-4 lg:bottom-15" />
 
       <Leaderboard />
 
-      <div className="w-full">
-        <img
-          src="/assets/section_divider.png"
-          alt="Section Divider"
-          className="relative -bottom-10 w-full h-auto object-contain"
-        />
-      </div>
+      {/* Added Divider before Events, similar to SSS divider */}
+      <Divider className="relative -bottom-10" />
+      <Events />
+
+      {/* Replaced with Divider component, passing original classes */}
+      <Divider className="relative -bottom-10" />
 
       <SSS />
 
-      <div className="w-full">
-        <img
-          src="/assets/section_divider.png"
-          alt="Section Divider"
-          className="relative bottom-10 w-full h-auto object-contain"
-        />
-      </div>
+      {/* Replaced with Divider component, passing original classes */}
+      <Divider className="relative bottom-10" />
 
       <Team />
       <GallerySection />
