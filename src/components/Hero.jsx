@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 
 const initialCountdownItems = [
-  { label: "Days", value: "00" },
-  { label: "Hours", value: "00" },
-  { label: "Minutes", value: "00" },
-  { label: "Seconds", value: "00" },
+  { label: "Gün", value: "00" },
+  { label: "Saat", value: "00" },
+  { label: "Dakika", value: "00" },
+  { label: "Saniye", value: "00" },
 ];
 
 function Hero({ nextEventNameProp, targetDateProp, loadingCountdownProp }) {
@@ -39,10 +39,10 @@ function Hero({ nextEventNameProp, targetDateProp, loadingCountdownProp }) {
         const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
         setCountdownItems([
-          { label: "Days", value: String(days).padStart(2, '0') },
-          { label: "Hours", value: String(hours).padStart(2, '0') },
-          { label: "Minutes", value: String(minutes).padStart(2, '0') },
-          { label: "Seconds", value: String(seconds).padStart(2, '0') },
+          { label: "Gün", value: String(days).padStart(2, '0') },
+          { label: "Saat", value: String(hours).padStart(2, '0') },
+          { label: "Dakika", value: String(minutes).padStart(2, '0') },
+          { label: "Saniye", value: String(seconds).padStart(2, '0') },
         ]);
       }, 1000);
       return () => clearInterval(interval);
